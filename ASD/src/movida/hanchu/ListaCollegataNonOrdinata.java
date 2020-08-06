@@ -1,37 +1,36 @@
 package movida.hanchu;
 
-import java.util.*;
-import movida.commons.*;
+import java.util.LinkedList;
 
-public class ListaCollegataNonOrdinata implements Dizionario {
-	protected LinkedList<Movie> movie;
+public class ListaCollegataNonOrdinata<T> implements Dizionario<T> {
+	protected LinkedList<T> value;
 	
 	public ListaCollegataNonOrdinata() {
-		this.movie = new LinkedList<Movie>();
+		this.value = new LinkedList<T>();
 	}
 
-	public Movie search(Movie film) {
-		int index = this.movie.indexOf(film);
+	public T search(T value) {
+		int index = this.value.indexOf(value);
 		if(index == -1) {
 			return null;
 		} else {
-			return this.movie.get(index);
+			return this.value.get(index);
 		}
 	}
 
-	public void insert(Movie film) {
-		Movie item = null;
-		item = search(film);
+	public void insert(T value) {
+		T item = null;
+		item = search(value);
 		if (item == null) {
-			this.movie.addFirst(film);
+			this.value.addFirst(value);
 		}
 	}
 
-	public void delete(Movie film) {
-		Movie item = null;
+	public void delete(T film) {
+		T item = null;
 		item = search(film);
 		if (item != null) {
-			this.movie.remove(film);
+			this.value.remove(film);
 		}
 	}
 

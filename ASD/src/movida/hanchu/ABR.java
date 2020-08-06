@@ -1,29 +1,27 @@
 package movida.hanchu;
 
-import movida.commons.Movie;
-
-public class ABR implements Dizionario {
-	protected ABRNodo abr;
+public class ABR<T extends Comparable<T>> implements Dizionario<T> {
+	protected ABRNodo<T> abr;
 	
 	public ABR() {
-		this.abr = new ABRNodo();
+		this.abr = new ABRNodo<T>();
 	}
 	
-	public ABRNodo max(ABRNodo tmp) {
+	public ABRNodo<T> max(ABRNodo<T> tmp) {
 		while(tmp != null && tmp.getDestro() != null) {
 			tmp = tmp.getDestro();
 		}
 		return tmp;
 	}
 	
-	public ABRNodo predecessore(ABRNodo tmp) {
+	public ABRNodo<T> predecessore(ABRNodo<T> tmp) {
 		if(tmp == null) {
 			return null;
 		} else {
 			if(tmp.getSinistro() != null) {
 				return max(tmp.getSinistro());
 			} else {
-				ABRNodo prec = tmp.getPadre();
+				ABRNodo<T> prec = tmp.getPadre();
 				while(tmp != null && tmp == prec.getSinistro()) {
 					tmp = prec;
 					prec = prec.getPadre();
@@ -33,36 +31,36 @@ public class ABR implements Dizionario {
 		}
 	}
 	
-	public Movie search(Movie film) {
-		ABRNodo tmp = this.abr;
+	public T search(T value) {
+		ABRNodo<T> tmp = this.abr;
 		while(tmp != null) {
-			if(tmp.getMovie().getTitle().compareTo(film.getTitle()) == 0) {
-				// il nodo è il film ricercato
-				return (tmp.getMovie());
+			if(tmp.getValue().compareTo(value) == 0) {
+				// il nodo è l'oggetto ricercato
+				return (tmp.getValue());
 			} else {
-				if(tmp.getMovie().getTitle().compareTo(film.getTitle()) < 0) {
-					// il film ricercato è più grande 
+				if(tmp.getValue().compareTo(value) < 0) {
+					// l'oggetto ricercato è più grande 
 					tmp = tmp.destro;
 				} else {
-					// il film ricercato e più piccolo
+					// l'oggetto ricercato e più piccolo
 					tmp = tmp.sinistro;
 				}
 			}
 		}
-		// il film ricercato non è presente
+		// l'oggetto ricercato non è presente
 		return null;
 	}
 
-	public void insert(Movie film) {
-		// cerca il film
-		Movie item = search(film);
+	public void insert(T value) {
+		// cerca l'oggetto
+		T item = search(value);
 		if(item == null) {
-			// il film non è presente
-			ABRNodo tmp = this.abr;
-			ABRNodo prec = null;
-			// si cerca il ramo giusto per il film
+			// l'oggetto non è presente
+			ABRNodo<T> tmp = this.abr;
+			ABRNodo<T> prec = null;
+			// si cerca il ramo giusto per l'oggetto
 			while(tmp != null) {
-				if(tmp.getMovie().getTitle().compareTo(film.getTitle()) < 0) {
+				if(tmp.getValue().compareTo(value) < 0) {
 					// si sposta sul ramo destro
 					prec = tmp;
 					tmp = tmp.destro;
@@ -72,24 +70,24 @@ public class ABR implements Dizionario {
 					tmp = tmp.sinistro;
 				}
 			}
-			// si crea il nuovo nodo e si aggiunge il film
-			tmp = new ABRNodo();
+			// si crea il nuovo nodo e si aggiunge l'oggetto
+			tmp = new ABRNodo<T>();
 			tmp.setPadre(prec);
-			tmp.setMovie(film);
+			tmp.setValue(value);
 		}
 	}
 
-	public void delete(Movie film) {
-		// si cerca il film
-		Movie item = null;
-		item = search(film);
+	public void delete(T value) {
+		// si cerca l'oggetto
+		T item = null;
+		item = search(value);
 		if(item != null) {
-			// il film è presente
-			ABRNodo tmp = this.abr;
-			ABRNodo prec = null;
+			// l'oggetto è presente
+			ABRNodo<T> tmp = this.abr;
+			ABRNodo<T> prec = null;
 			// si cerca il film
-			while(tmp.getMovie().getTitle().compareTo(film.getTitle()) == 0) {
-				if(tmp.getMovie().getTitle().compareTo(film.getTitle()) < 0) {
+			while(tmp.getValue().compareTo(value) == 0) {
+				if(tmp.getValue().compareTo(value) < 0) {
 					prec = tmp;
 					tmp = tmp.destro;
 				} else {
@@ -97,7 +95,7 @@ public class ABR implements Dizionario {
 					tmp = tmp.sinistro;
 				}
 			}
-			// trovato il film, il nodo tmp
+			// l'oggetto da cancellare è il nodo tmp
 			if(tmp.getDestro() == null && tmp.getSinistro() == null) {
 				// il nodo è una foglia
 				tmp = null;
@@ -105,11 +103,11 @@ public class ABR implements Dizionario {
 				if(tmp.getDestro() != null && tmp.getSinistro() != null) {
 					// il nodo ha 2 figli 
 					// si individua il predecessore
-					ABRNodo pred = predecessore(tmp);
+					ABRNodo<T> pred = predecessore(tmp);
 					// il padre del preddecessore ha come figlio destro il figlio sinistro del predecessore
 					prec.getPadre().setDestro(pred.getSinistro());
 					// il nodo da cancellare assume valore del predecessore
-					tmp.setMovie(prec.getMovie());
+					tmp.setValue(prec.getValue());
 				} else {
 					// il nodo ha un figlio solo
 					if(tmp.getDestro() != null) {

@@ -1,9 +1,7 @@
 package movida.hanchu;
 
-import movida.commons.*;
-
-public interface Dizionario {
-	public Movie search(Movie film);
-	public void insert(Movie film);
-	public void delete(Movie film);
+public interface Dizionario <T>{
+	public T search(T value);
+	public void insert(T value);
+	public void delete(T value);
 }

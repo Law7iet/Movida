@@ -12,12 +12,12 @@ package movida.commons;
  * Classe usata per rappresentare una persona, attore o regista,
  * nell'applicazione Movida.
  * 
- * Una persona è identificata in modo univoco dal nome 
+ * Una persona ÔøΩ identificata in modo univoco dal nome 
  * case-insensitive, senza spazi iniziali e finali, senza spazi doppi. 
  * 
- * Semplificazione: <code>name</code> è usato per memorizzare il nome completo (nome e cognome)
+ * Semplificazione: <code>name</code> ÔøΩ usato per memorizzare il nome completo (nome e cognome)
  * 
- * La classe può essere modicata o estesa ma deve implementare il metodo getName().
+ * La classe puÔøΩ essere modicata o estesa ma deve implementare il metodo getName().
  * 
  */
 public class Person {
@@ -32,4 +32,12 @@ public class Person {
 		return this.name;
 	}
 	
+	// compara il titolo di due film
+	public int compareTo(Person name) {
+		// converto le lettere dei film in minuscole
+		String tmp1 = this.name.toLowerCase();
+		String tmp2 = name.getName().toLowerCase();
+		// faccio il paragone
+		return tmp1.compareTo(tmp2);	
+	}
 }

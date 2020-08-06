@@ -12,34 +12,34 @@ import movida.commons.*;
 public class MovidaCore implements IMovidaDB {
 	protected Dizionario<Movie> dizionarioFilm;
 	protected Dizionario<Person> dizionarioPersone;
-	
+
 	public MovidaCore() {
 		this.dizionarioFilm = new ABR<Movie>();
 		this.dizionarioPersone = new ListaCollegataNonOrdinata<Person>();
 	}
-	
+
 	public void loadFromFile(File f) throws MovidaFileException {
 		try {
 			Path path = f.toPath();
 			List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_16);
 			while(!lines.isEmpty()) {
-				
+
 				String riga1 = lines.get(1);
 				String riga2 = lines.get(2);
 				String riga3 = lines.get(3);
 				String riga4 = lines.get(4);
 				String riga5 = lines.get(5);
-				
+
 				if(riga1.contains("Title: ") && riga2.contains("Year: ") && riga3.contains("Director: ") && riga4.contains("Cast: ") && riga5.contains("Votes: ")) {
 					riga1 = riga1.substring(7);
 					riga2 = riga2.substring(6);
 					riga3 = riga3.substring(9);
 					riga4 = riga4.substring(6);
 					riga5 = riga5.substring(7);
-				} else { 
+				} else {
 					throw new MovidaFileException();
 				}
-				
+
 				String title = riga1;
 				int year = Integer.parseInt(riga2);
 				Person director = new Person(riga3);
@@ -50,7 +50,7 @@ public class MovidaCore implements IMovidaDB {
 					cast[index] = new Person(name);
 				}
 				int votes = Integer.parseInt(riga5);
-				
+
 				Movie movie = new Movie(title, year, votes, cast, director);
 				if(dizionarioFilm.search(movie) == null) {
 					dizionarioFilm.insert(movie);
@@ -58,7 +58,7 @@ public class MovidaCore implements IMovidaDB {
 					dizionarioFilm.delete(movie);
 					dizionarioFilm.insert(movie);
 				}
-				
+
 				if(dizionarioPersone.search(director) == null) {
 					dizionarioPersone.insert(director);
 				}
@@ -67,7 +67,8 @@ public class MovidaCore implements IMovidaDB {
 						dizionarioPersone.insert(director);
 					}
 				}
-				
+
+
 				
 				for(index = 1; index < 7; index++) {
 					lines.remove(1);
@@ -78,17 +79,17 @@ public class MovidaCore implements IMovidaDB {
 			new MovidaFileException().getMessage();
 		}
 	}
-		
+
 	@Override
 	public void saveToFile(File f) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void clear() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override

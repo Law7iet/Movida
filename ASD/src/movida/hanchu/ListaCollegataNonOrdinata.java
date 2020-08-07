@@ -34,4 +34,12 @@ public class ListaCollegataNonOrdinata<T> implements Dizionario<T> {
 		}
 	}
 
+	public int getSize() {
+		return this.value.size();
+	}
+
+	public LinkedList<T> convertList() {
+		return this.value;
+	}
+
 }

@@ -1,5 +1,7 @@
 package movida.hanchu;
 
+import java.util.LinkedList;
+
 public class ABR<T extends Comparable<T>> implements Dizionario<T> {
 	protected ABRNodo<T> abr;
 	
@@ -122,5 +124,45 @@ public class ABR<T extends Comparable<T>> implements Dizionario<T> {
 				}
 			}
 		}
+	}
+
+	// NON UTILIZZATO ----------------------------------------------------
+	public int getSize() {
+		LinkedList<ABRNodo<T>> coda = new LinkedList<ABRNodo<T>>();
+		coda.addFirst(this.abr);
+		int counter = 0;
+		while(!coda.isEmpty()) {
+			ABRNodo<T> tmp = coda.getLast();
+			if(tmp.getSinistro() != null) {
+				coda.addFirst(tmp.getSinistro());
+			}
+			if(tmp.getDestro() != null) {
+				coda.addFirst(tmp.getDestro());
+			}
+			counter++;
+			coda.removeLast();
+		}
+		return counter;
+	}
+	// --------------------------------------------------------------------
+
+	public void pre_visit(ABRNodo<T> tmp, LinkedList<T> lista){
+		if(tmp != null) {
+			if(tmp.getSinistro() != null) {
+				pre_visit(tmp.getSinistro(), lista);
+			}
+			lista.addLast(tmp.getValue());
+			if(tmp.getDestro() != null) {
+				pre_visit(tmp.getDestro(), lista);
+			}
+		}
+	}
+	
+	public LinkedList<T> convertList() {
+		ABRNodo<T> tmp = new ABRNodo<T>();
+		tmp = this.abr;
+		LinkedList<T> lista = new LinkedList<T>();
+		pre_visit(tmp, lista);
+		return lista;
 	}
 }

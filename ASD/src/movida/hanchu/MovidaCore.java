@@ -11,20 +11,55 @@ import java.util.List;
 
 import movida.commons.*;
 
-public class MovidaCore implements IMovidaDB {
+public class MovidaCore implements IMovidaConfig, IMovidaDB {
+	// una struttura dati per i film e una per le persone
 	protected Dizionario<Movie> dizionarioFilm;
 	protected Dizionario<Person> dizionarioPersone;
+	protected Ordinamento ordinamento;
 	
+	// il costruttore
 	public MovidaCore() {
 		this.dizionarioFilm = new ABR<Movie>();
-		this.dizionarioPersone = new ListaCollegataNonOrdinata<Person>();
+		this.dizionarioPersone = new ABR<Person>();
+		this.ordinamento = new BubbleSort();
 	}
+	
+	// IMovidaConfig INIZIO ----------------------------------------------------
+	public boolean setMap(MapImplementation m) {
+		if(m == MapImplementation.ABR) {
+			this.dizionarioFilm = new ABR<Movie>();
+			this.dizionarioPersone = new ABR<Person>();
+			return true;
+		} else if(m == MapImplementation.ListaNonOrdinata) {
+			this.dizionarioFilm = new ListaNonOrdinata<Movie>();
+			this.dizionarioPersone = new ListaNonOrdinata<Person>();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean setSort(SortingAlgorithm a) {
+		if(a == SortingAlgorithm.BubbleSort) {
+			this.ordinamento = new BubbleSort();
+			return true;
+		} else if(a == SortingAlgorithm.MergeSort) {
+			this.ordinamento = new MergeSort();
+			return true;
+		} else {
+			return false;
+		}
+	}
+	// IMovidaConfig FINE ------------------------------------------------------
 
+	// IMovidaDB INIZIO --------------------------------------------------------
 	public void loadFromFile(File f) throws MovidaFileException {
 		try {
 			Path path = f.toPath();
-			// converte il file in array di stringhe, ogni elemento è una riga del file
+			// converte il file in array di stringhe
+			// ogni elemento di 'lines' è una riga del file
 			List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_16);
+			// itera finché non legge tutte le righe
 			while(!lines.isEmpty()) {
 				// copia le prime 5 righe
 				String riga1 = lines.get(1);
@@ -34,7 +69,7 @@ public class MovidaCore implements IMovidaDB {
 				String riga5 = lines.get(5);
 				// controlla se le righe corrispondono ai dati di un film
 				if(riga1.contains("Title: ") && riga2.contains("Year: ") && riga3.contains("Director: ") && riga4.contains("Cast: ") && riga5.contains("Votes: ")) {
-					// cattura solo i dati significativi
+					// cattura i dati significativi di ogni stringa
 					riga1 = riga1.substring(7);
 					riga2 = riga2.substring(6);
 					riga3 = riga3.substring(9);
@@ -43,22 +78,25 @@ public class MovidaCore implements IMovidaDB {
 				} else {
 					throw new MovidaFileException();
 				}
+				
 				// copia i dati mel giusto formato per il film
 				String title = riga1;
 				int year = Integer.parseInt(riga2);
 				Person director = new Person(riga3);
-				// separa la lista degli attori in un array di stringhe
+				// per il cast, separa la lista degli attori in un array di stringhe
 				String[] tmp = riga4.split(", ");
 				Person[] cast = new Person[tmp.length];
 				int index = 0;
 				// assegna ad ogni elemento di Person un attore
 				for(String name : tmp) {
 					cast[index] = new Person(name);
+					index++;
 				}
 				int votes = Integer.parseInt(riga5);
-				// istanza dell'oggetto movie
+				
+				// crea l'oggetto movie con i dati raccolti
 				Movie movie = new Movie(title, year, votes, cast, director);
-				// controllo della sua presenza del database
+				// controllo della sua presenza sul database del film
 				if(dizionarioFilm.search(movie) == null) {
 					// se non è presente lo si inserisce
 					dizionarioFilm.insert(movie);
@@ -67,9 +105,7 @@ public class MovidaCore implements IMovidaDB {
 					dizionarioFilm.delete(movie);
 					dizionarioFilm.insert(movie);
 				}
-
-				// ---------------------------------------------------------
-				// controllo della presenza delle persone
+				// controllo della presenza sul database delle persone
 				if(dizionarioPersone.search(director) == null) {
 					dizionarioPersone.insert(director);
 				}
@@ -78,7 +114,6 @@ public class MovidaCore implements IMovidaDB {
 						dizionarioPersone.insert(director);
 					}
 				}
-				// ----------------------------------------------------------
 				
 				// cancellazione delle righe usate
 				for(index = 1; index < 6; index++) {
@@ -103,7 +138,7 @@ public class MovidaCore implements IMovidaDB {
 			writer.print("");
 			writer.close();
 			// inserisco i dati del database
-			LinkedList<Movie> tmp = dizionarioFilm.convertList();
+			LinkedList<Movie> tmp = dizionarioFilm.convertToList();
 			Movie[] lista;
 			lista = (Movie[]) tmp.toArray();
 			
@@ -128,7 +163,7 @@ public class MovidaCore implements IMovidaDB {
 			
 			// stampa i personaggi
 			writer.println("PERSONAGGI:");
-			LinkedList<Person> x = dizionarioPersone.convertList();
+			LinkedList<Person> x = dizionarioPersone.convertToList();
 			Person[] persone = (Person[]) x.toArray();
 			for(Person persona : persone) {
 				writer.println(persona.getName());
@@ -141,9 +176,9 @@ public class MovidaCore implements IMovidaDB {
 	}
 
 	public void clear() {
-		dizionarioFilm = null;
-		dizionarioPersone = null;
-
+		// crea una nuova istanza delle classi
+		this.dizionarioFilm = new ABR<Movie>();
+		this.dizionarioPersone = new ABR<Person>();
 	}
 
 	public int countMovies() {
@@ -154,13 +189,12 @@ public class MovidaCore implements IMovidaDB {
 		return dizionarioPersone.getSize();
 	}
 
-
 	public boolean deleteMovieByTitle(String title) {
+		// converte 'dizionarioFilm' in un array
+		LinkedList<Movie> tmp = dizionarioFilm.convertToList();
+		Movie[] lista = (Movie[]) tmp.toArray();
 		boolean trovato = false;
-		LinkedList<Movie> tmp = dizionarioFilm.convertList();
-		Movie[] lista;
 		Movie film = null;
-		lista = (Movie[]) tmp.toArray();
 		for(Movie movie : lista) {
 			if(movie.getTitle().compareTo(title) == 0) {
 				trovato = true;
@@ -175,7 +209,7 @@ public class MovidaCore implements IMovidaDB {
 	}
 
 	public Movie getMovieByTitle(String title) {
-		LinkedList<Movie> tmp = dizionarioFilm.convertList();
+		LinkedList<Movie> tmp = dizionarioFilm.convertToList();
 		Movie[] lista = (Movie[]) tmp.toArray();
 		for(Movie movie : lista) {
 			if(movie.getTitle().compareTo(title) == 0) {
@@ -186,7 +220,7 @@ public class MovidaCore implements IMovidaDB {
 	}
 
 	public Person getPersonByName(String name) {
-		LinkedList<Person> tmp = dizionarioPersone.convertList();
+		LinkedList<Person> tmp = dizionarioPersone.convertToList();
 		Person[] lista = (Person[]) tmp.toArray();
 		for(Person persona : lista) {
 			if(persona.getName().compareTo(name) == 0) {
@@ -197,13 +231,14 @@ public class MovidaCore implements IMovidaDB {
 	}
 
 	public Movie[] getAllMovies() {
-		LinkedList<Movie> tmp = dizionarioFilm.convertList();
+		LinkedList<Movie> tmp = dizionarioFilm.convertToList();
 		return (Movie[]) tmp.toArray();
 	}
 
 	public Person[] getAllPeople() {
-		LinkedList<Person> tmp = dizionarioPersone.convertList();
+		LinkedList<Person> tmp = dizionarioPersone.convertToList();
 		return (Person[]) tmp.toArray();
 	}
+	// IMovidaConfig FINE ------------------------------------------------------
 
 }

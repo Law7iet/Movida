@@ -2,45 +2,59 @@ package movida.hanchu;
 
 import java.util.LinkedList;
 
-public class ABR<V extends Comparable<V>> implements Dizionario<V> {
+public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 	protected ABRNodo<V> root;
 	
 	public ABR() {
-		this.root = new ABRNodo<V>();
+		this.root = null;
+	}
+	
+	public ABRNodo<V> getRoot() {
+		return this.root;
 	}
 	
 	public ABRNodo<V> min(ABRNodo<V> node) {
-		while(node != null && node.getSinistro() != null) {
-			node = node.getSinistro();
+		if(node == null) {
+			return null;
+		} else {
+			if(node.left != null) {
+				return min(node.left);
+			} else {
+				return node;
+			}
 		}
-		return node;
 	}
 	
 	public ABRNodo<V> max(ABRNodo<V> node) {
-		while(node != null && node.getDestro() != null) {
-			node = node.getDestro();
+		if(node == null) {
+			return null;
+		} else {
+			if(node.right != null) {
+				return max(node.right);
+			} else {
+				return node;
+			}
 		}
-		return node;
 	}
 	
 	public ABRNodo<V> predecessore(ABRNodo<V> node) {
-		if(node == null) {
+		if(node == null || min(this.root) == node) {
 			// il nodo è vuoto
 			return null;
 		} else {
 			// il nodo non è vuoto
-			if(node.getSinistro() != null) {
+			if(node.left != null) {
 				// il nodo ha un figlio sinistro
 				// allora è il massimo del figlio sinistro
-				return max(node.getSinistro());
+				return max(node.left);
 			} else {
 				// non ha un figlio sinistro
 				// lo si ricerca partendo dal suo genitore
-				ABRNodo<V> parent = node.getPadre();
+				ABRNodo<V> parent = node.parent;
 				// è il primo antenato che ha il nodo passato come parametro nel suo antenato sinistro
-				while(node != null && node == parent.getSinistro()) {
+				while(node != null && node == parent.left) {
 					node = parent;
-					parent = parent.getPadre();
+					parent = parent.parent;
 				}
 				return parent;
 			}
@@ -48,147 +62,129 @@ public class ABR<V extends Comparable<V>> implements Dizionario<V> {
 	}
 	
 	public ABRNodo<V> successore(ABRNodo<V> node) {
-		if(node == null) {
+		if(node == null || max(this.root) == node) {
 			// il nodo è vuoto
 			return null;
 		} else {
 			// il nodo non è vuoto
-			if(node.getDestro() != null) {
+			if(node.right != null) {
 				// il nodo ha un figlio destro
 				// allora è il minimo del figlio sinistro
-				return min(node.getDestro());
+				return min(node.right);
 			} else {
 				// non ha un figlio destro
 				// lo si ricerca partendo dal suo genitore
-				ABRNodo<V> parent = node.getPadre();
-				// è il primo antenato che ha il nodo passato come parametro nel suo antenato destro
-				while(node != null && node == parent.getDestro()) {
+				ABRNodo<V> parent = node.parent;
+				// è il primo antenato che ha il nodo passato come parametro nel suo antenato desstro
+				while(node != null && node == parent.right) {
 					node = parent;
-					parent = parent.getPadre();
+					parent = parent.parent;
 				}
 				return parent;
 			}
 		}
-	} 
+	}
 	
-	public V search(V value) {
-		ABRNodo<V> node = this.root;
-		// ricercca binaria
-		while(node != null) {
-			if(node.getValue().compareTo(value) == 0) {
-				// il nodo è l'oggetto ricercato
-				return (node.getValue());
+	public V search(String type, V value) throws MovidaCompareException {
+		return search(this.root, type, value);
+	}
+	
+	private V search(ABRNodo<V> node, String type, V value) throws MovidaCompareException {
+		if(node == null) {
+			return null;
+		} else {
+			if(node.value.compareTo(type, value) == 0) {
+				return node.value;
 			} else {
-				if(node.getValue().compareTo(value) < 0) {
-					// l'oggetto ricercato è più grande e si trova a destra
-					node = node.destro;
+				if(node.value.compareTo(type, value) > 0) {
+					return search(node.left, type, value);
 				} else {
-					// l'oggetto ricercato e più piccolo e si trova a sinistra
-					node = node.sinistro;
+					return search(node.right, type, value);
 				}
 			}
 		}
-		// l'oggetto ricercato non è presente
-		return null;
 	}
 
-	// l'ordine è in base al titolo del film
-	public void insert(V value) {
-		// cerca l'oggetto
-		V item = search(value);
-		if(item == null) {
+	public void insert(String type, V value) throws MovidaCompareException {
+        this.root = insert(this.root, null, type, value);
+	}
+	
+	private ABRNodo<V> insert(ABRNodo<V> node, ABRNodo<V> parent, String type, V value) throws MovidaCompareException {
+		if(node == null) {
+			node = new ABRNodo<V>(value, parent);
+		} else {
+			if(node.value.compareTo(type, value) > 0) {
+				node.left = insert(node.left, node, type, value);
+			} else {
+				node.right = insert(node.right, node, type, value);
+			}
+		}
+		return node;
+	}
+
+	public void delete(String type, V value) throws MovidaCompareException {
+		this.root = delete(this.root, type, value);
+	}
+	
+	private ABRNodo<V> delete(ABRNodo<V> node, String type, V value) throws MovidaCompareException {
+		if(node == null) {
 			// l'oggetto non è presente
-			// si cerca il ramo giusto per l'oggetto
-			ABRNodo<V> node = this.root;
-			ABRNodo<V> parent = null;
-			while(node != null) {
-				if(node.getValue().compareTo(value) < 0) {
-					// si sposta sul ramo destro
-					parent = node;
-					node = node.destro;
-				} else {
-					// si sposta sul ramo sinistro
-					parent = node;
-					node = node.sinistro;
-				}
-			}
-			// si crea il nuovo nodo e si aggiunge l'oggetto
-			node = new ABRNodo<V>();
-			node.setPadre(parent);
-			node.setValue(value);
-		}
-	}
-
-	public void delete(V value) {
-		// si cerca l'oggetto
-		V item = search(value);
-		if(item != null) {
-			// l'oggetto è presente
+			return null;
+		} else {
 			// si cerca l'oggetto
-			ABRNodo<V> nodo = this.root;
-			ABRNodo<V> parent = null;
-			// si intera finché non lo si trova
-			// si usa la ricerca binaria
-			while(nodo.getValue().compareTo(value) == 0) {
-				if(nodo.getValue().compareTo(value) < 0) {
-					parent = nodo;
-					nodo = nodo.destro;
-				} else {
-					parent = nodo;
-					nodo = nodo.sinistro;
-				}
-			}
-			// l'oggetto da cancellare è 'node'
-			if(nodo.getDestro() == null && nodo.getSinistro() == null) {
-				// 'node' è una foglia
-				// lo si cancella direttamente
-				nodo = null;
+			if(node.value.compareTo(type, value) > 0) {
+				// si trova a sinistra
+	            node.left = delete(node.left, type, value);
 			} else {
-				if(nodo.getDestro() != null && nodo.getSinistro() != null) {
-					// il nodo ha 2 figli 
-					// si individua il predecessore
-					ABRNodo<V> pred = predecessore(nodo);
-					// il padre del preddecessore ha come figlio destro il figlio sinistro del predecessore
-					parent.getPadre().setDestro(pred.getSinistro());
-					// il nodo da cancellare assume valore del predecessore
-					nodo.setValue(parent.getValue());
+				if(node.value.compareTo(type, value) < 0)  {
+		            // si trova a destra
+					node.right = delete(node.right, type, value);
 				} else {
-					// il nodo ha un figlio solo
-					if(nodo.getDestro() != null) {
-						// il nodo ha un figlio destro
-						nodo.getPadre().setDestro(nodo.getDestro());
-						nodo.getDestro().setPadre(nodo.getPadre());
+					// 'node' è l'oggettoo da cancellare
+					if(node.left == null && node.right == null) {
+						// 'node' è una foglia
+						// lo si cancella direttamente
+						node = null;
 					} else {
-						// il nodo ha figlio sinistro
-						nodo.getPadre().setSinistro(nodo.getSinistro());
-						nodo.getSinistro().setPadre(nodo.getPadre());
+						if(node.left != null && node.right != null) {
+							// il nodo ha 2 figli 
+							// si individua il predecessore
+							ABRNodo<V> pred = predecessore(node);
+							// il nodo da cancellare assume valore del predecessore
+							node.value = pred.value;
+
+							// il padre del predecessore ha come figlio destro il figlio sinistro del predecessore
+							node.left = pred.left;
+
+						} else {
+							// il nodo ha un figlio solo
+							if(node.left != null) {
+								// il nodo ha figlio sinistro
+								node.parent.left = node.left;
+								node.left.parent = node.parent;
+							} else {
+								// il nodo ha un figlio destro
+								node.parent.right = node.right;
+								node.right.parent = node.left;
+							}
+						}
 					}
 				}
-			}
+			}		
 		}
+		return node;
 	}
 
 	public int getSize() {
-		// si fa una visita dell'albero utilizzando una coda che contiene i nodi non visitati
-		LinkedList<ABRNodo<V>> coda = new LinkedList<ABRNodo<V>>();
-		// si mette nella coda il nodo-radice
-		coda.addFirst(this.root);
-		int counter = 0;
-		// se la coda è vuota significa che si ha visitato tutto l'albero
-		while(!coda.isEmpty()) {
-			// si aggiunge in coda i suoi figli
-			ABRNodo<V> tmp = coda.getLast();
-			if(tmp.getSinistro() != null) {
-				coda.addFirst(tmp.getSinistro());
-			}
-			if(tmp.getDestro() != null) {
-				coda.addFirst(tmp.getDestro());
-			}
-			// si visita il nodo e lo si cancella
-			counter++;
-			coda.removeLast();
+		return getSize(this.root);
+	}
+	
+	private int getSize(ABRNodo<V> node) {
+		if(node == null) {
+			return 0;
+		} else {
+			return 1 + getSize(node.left) + getSize(node.right);
 		}
-		return counter;
 	}
 
 	// funzione ausiliaria a convertList
@@ -196,15 +192,15 @@ public class ABR<V extends Comparable<V>> implements Dizionario<V> {
 	// visita il nodo con una pre-visita e aggiunge ad ogni visita il nodo alla lista
 	public void pre_visit(ABRNodo<V> tmp, LinkedList<V> lista) {
 		if(tmp != null) {
-			if(tmp.getSinistro() != null) {
+			if(tmp.left != null) {
 				// 1 si visita prima il sotto-albero sinistro
-				pre_visit(tmp.getSinistro(), lista);
+				pre_visit(tmp.left, lista);
 			}
 			// 2 si visita il nodo corrente
-			lista.addLast(tmp.getValue());
-			if(tmp.getDestro() != null) {
+			lista.addLast(tmp.value);
+			if(tmp.right != null) {
 				// 3 si visita il sotto-albero destro
-				pre_visit(tmp.getDestro(), lista);
+				pre_visit(tmp.right, lista);
 			}
 		}
 	}
@@ -216,6 +212,7 @@ public class ABR<V extends Comparable<V>> implements Dizionario<V> {
 		return lista;
 	}
 
+	/*
 	// !----------------------------------------------------------------------------------------------
 	// se si converte l'albero in un array e lo si ordina
 	// dopo aver convertito l'albero con i dati dell'array, futuri insert non rendono l'albero un ABR
@@ -229,4 +226,5 @@ public class ABR<V extends Comparable<V>> implements Dizionario<V> {
 			tmp = successore(tmp);		
 		}
 	}
+	*/
 }

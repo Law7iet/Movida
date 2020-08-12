@@ -8,6 +8,9 @@
 */
 package movida.commons;
 
+import movida.hanchu.ComparableType;
+import movida.hanchu.MovidaCompareException;
+
 /**
  * Classe usata per rappresentare un film
  * nell'applicazione Movida.
@@ -19,7 +22,7 @@ package movida.commons;
  * per recupare le informazioni caratterizzanti di un film.
  * 
  */
-public class Movie implements Comparable<Movie> {
+public class Movie implements ComparableType<Movie> {
 	
 	private String title;
 	private Integer year;
@@ -56,11 +59,24 @@ public class Movie implements Comparable<Movie> {
 	}
 	
 	// compara il titolo di due film
-	public int compareTo(Movie movie) {
-		// converto le lettere dei film in minuscole
-		String tmp1 = this.title.toLowerCase();
-		String tmp2 = movie.getTitle().toLowerCase();
-		// faccio il paragone
-		return tmp1.compareTo(tmp2);	
+	public int compareTo(String type, Movie movie) throws MovidaCompareException {
+		switch(type) {
+		case "Title":
+			// converto le lettere dei film in minuscole
+			String tmp1 = this.title.toLowerCase();
+			String tmp2 = movie.getTitle().toLowerCase();
+			// faccio il paragone
+			return tmp1.compareTo(tmp2);
+		case "Year":
+			return this.year.compareTo(movie.getYear());
+		case "Director":
+			String tmp3 = this.director.getName().toLowerCase().trim();
+			String tmp4 = movie.getDirector().getName().toLowerCase().trim();
+			return tmp3.compareTo(tmp4);
+		case "Votes":
+			return this.votes.compareTo(movie.getVotes());
+		default:
+			throw new MovidaCompareException();
+		}
 	}
 }

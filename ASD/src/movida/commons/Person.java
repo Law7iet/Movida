@@ -8,6 +8,9 @@
 */
 package movida.commons;
 
+import movida.hanchu.ComparableType;
+import movida.hanchu.MovidaCompareException;
+
 /**
  * Classe usata per rappresentare una persona, attore o regista,
  * nell'applicazione Movida.
@@ -20,24 +23,40 @@ package movida.commons;
  * La classe pu� essere modicata o estesa ma deve implementare il metodo getName().
  * 
  */
-public class Person implements Comparable<Person> {
+public class Person implements ComparableType<Person> {
 
 	private String name;
+	private int film;
 	
-	public Person(String name) {
+	public Person(String name, int film) {
 		this.name = name;
+		this.film = film;
 	}
 	
-	public String getName(){
+	public String getName() {
 		return this.name;
 	}
 	
+	public int getFilm() {
+		return this.film;
+	}
+	
+	public void addFilm() {
+		this.film++;
+	}
+	
 	// compara il titolo di due film
-	public int compareTo(Person name) {
-		// converto le lettere dei film in minuscole
-		String tmp1 = this.name.toLowerCase();
-		String tmp2 = name.getName().toLowerCase();
-		// faccio il paragone
-		return tmp1.compareTo(tmp2);	
+	public int compareTo(String type, Person name) throws MovidaCompareException {
+		switch(type) {
+		case "Name":
+			// converto le lettere dei film in minuscole
+			String tmp1 = this.name.toLowerCase();
+			String tmp2 = name.getName().toLowerCase();
+			// faccio il paragone
+			return tmp1.compareTo(tmp2);
+		default:
+			throw new MovidaCompareException();
+		}
+			
 	}
 }

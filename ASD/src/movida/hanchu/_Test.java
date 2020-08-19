@@ -2,6 +2,7 @@ package movida.hanchu;
 
 import java.io.File;
 
+import movida.commons.Collaboration;
 import movida.commons.MapImplementation;
 import movida.commons.Movie;
 import movida.commons.Person;
@@ -17,10 +18,16 @@ public class _Test {
 		
 		object.loadFromFile(myObj);
 		
-		Movie[] tmp = object.searchMostVotedMovies(10);
-		
-		for(Movie element : tmp) {
-			System.out.println(element.getTitle());
+		for(Collaboration element : object.maximizeCollaborationsInTheTeamOf(object.getPersonByName("Robert De Niro"))) {
+			System.out.println(element.getActorA().getName() + " " + element.getActorB().getName() + " " + element.getScore());
 		}
+		System.out.println("");
+		/*
+		object.deleteMovieByTitle("Cape Fear");
+		for(Person element : object.getTeamOf(object.getPersonByName("Robert De Niro"))) {
+			System.out.println(element.getName());
+		}
+		System.out.println("");
+		*/
 	}
 }

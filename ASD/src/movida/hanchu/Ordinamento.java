@@ -20,13 +20,65 @@ public abstract class Ordinamento {
 		this.crescente = crescente;
 	}
 	
+	public int confronta(Movie x, Movie y) {
+		int value = 0;
+		switch(this.field) {
+		case "Title":
+			if(this.crescente == true) {
+				value = x.getTitle().compareTo(y.getTitle());
+			} else {
+				value = -1 * (x.getTitle().compareTo(y.getTitle()));
+			}
+			break;
+		case "Votes":
+			if(this.crescente == true) {
+				value = x.getVotes() - y.getVotes();
+			} else {
+				value = -1 * (x.getVotes() - y.getVotes());
+			}
+			break;
+		case "Year":
+			if(this.crescente == true) {
+				value = x.getYear() - y.getYear();
+			} else {
+				value = -1 * (x.getYear() - y.getYear());
+			}
+			break;
+		default:
+			value = -1;
+		}
+		return value;
+	}
+	
+	public int confronta(Person x, Person y) {
+		int value = 0;
+		switch(this.field) {
+		case "Name":
+			if(this.crescente == true) {
+				value = x.getName().compareTo(y.getName());
+			} else {
+				value = -1 * (x.getName().compareTo(y.getName()));
+			}
+			break;
+		case "Activity":
+			if(this.crescente == true) {
+				value = x.getFilm() - y.getFilm();
+			} else {
+				value = -1 * (x.getFilm() - y.getFilm());
+			}
+			break;
+		default:
+			value = -1;
+		}
+		return value;
+	}
+
+	
 	public Movie[] ordina(Movie[] values) {
-		// dipende dall'algoritmo di ordinamento
 		return null;
 	}
 	
-	public Person[] ordina(Person[] values) {
-		
+	public Person[] ordina(Person[] values) {	
 		return null;
 	}
 }

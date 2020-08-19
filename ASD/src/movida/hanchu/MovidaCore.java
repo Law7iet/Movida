@@ -12,12 +12,13 @@ import java.util.List;
 
 import movida.commons.*;
 
-public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
+public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMovidaCollaborations {
 	// una struttura dati per i film e una per le persone
 	protected Dizionario<Movie> dizionarioFilm;
 	protected Dizionario<Person> dizionarioAttori;
 	protected Dizionario<Person> dizionarioRegisti;
 	protected Ordinamento ordinamento;
+	protected Grafo grafo;
 	
 	// il costruttore
 	public MovidaCore() {
@@ -25,6 +26,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		this.dizionarioAttori = new ABR<Person>();
 		this.dizionarioRegisti = new ABR<Person>();
 		this.ordinamento = new BubbleSort();
+		this.grafo = new Grafo();
 	}
 	
 	// IMovidaConfig INIZIO ----------------------------------------------------
@@ -56,7 +58,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		}
 	}
 	// IMovidaConfig FINE ------------------------------------------------------
-
+	
 	// IMovidaDB INIZIO --------------------------------------------------------
 	public void loadFromFile(File f) throws MovidaFileException {
 		try {
@@ -124,6 +126,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 						dizionarioAttori.search("Name", persona).addFilm();
 					}
 				}
+				grafo.addMovieCollaboration(movie);
 				
 				// cancellazione delle righe usate
 				for(index = 1; index < 6; index++) {
@@ -177,20 +180,21 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		this.dizionarioFilm = new ABR<Movie>();
 		this.dizionarioAttori = new ABR<Person>();
 		this.dizionarioRegisti = new ABR<Person>();
+		this.grafo = new Grafo();
 	}
 
 	public int countMovies() {
-		return dizionarioFilm.getSize();
+		return this.dizionarioFilm.getSize();
 	}
 
 	public int countPeople() {
-		return dizionarioAttori.getSize() + dizionarioRegisti.getSize();
+		return this.dizionarioAttori.getSize() + this.dizionarioRegisti.getSize();
 	}
 
 	public boolean deleteMovieByTitle(String title) throws MovidaCompareException {
 		// converte 'dizionarioFilm' in un array
-		LinkedList<Movie> lista = dizionarioFilm.convertToList();
-		Movie[] array = new Movie[dizionarioFilm.getSize()];
+		LinkedList<Movie> lista = this.dizionarioFilm.convertToList();
+		Movie[] array = new Movie[this.dizionarioFilm.getSize()];
 		lista.toArray(array);
 		boolean trovato = false;
 		Movie film = null;
@@ -202,13 +206,14 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 			}
 		}
 		if(trovato) {
-			dizionarioFilm.delete("Title", film);
+			this.grafo.removeMovieCollaboration(film);
+			this.dizionarioFilm.delete("Title", film);
 		}
 		return trovato;
 	}
 
 	public Movie getMovieByTitle(String title) {
-		LinkedList<Movie> tmp = dizionarioFilm.convertToList();
+		LinkedList<Movie> tmp = this.dizionarioFilm.convertToList();
 		Movie[] lista = (Movie[]) tmp.toArray();
 		for(Movie movie : lista) {
 			if(movie.getTitle().compareTo(title) == 0) {
@@ -219,16 +224,16 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 	}
 
 	public Person getPersonByName(String name) {
-		LinkedList<Person> lista = dizionarioAttori.convertToList();
-		Person[] array = new Person[dizionarioAttori.getSize()];
+		LinkedList<Person> lista = this.dizionarioAttori.convertToList();
+		Person[] array = new Person[this.dizionarioAttori.getSize()];
 		lista.toArray(array);
 		for(Person persona : array) {
 			if(persona.getName().compareTo(name) == 0) {
 				return persona;
 			}
 		}
-		lista = dizionarioRegisti.convertToList();
-		array = new Person[dizionarioRegisti.getSize()];
+		lista = this.dizionarioRegisti.convertToList();
+		array = new Person[this.dizionarioRegisti.getSize()];
 		lista.toArray(array);
 		for(Person persona : array) {
 			if(persona.getName().compareTo(name) == 0) {
@@ -239,21 +244,21 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 	}
 
 	public Movie[] getAllMovies() {
-		LinkedList<Movie> tmp = dizionarioFilm.convertToList();
-		Movie[] array = new Movie[dizionarioFilm.getSize()];
+		LinkedList<Movie> tmp = this.dizionarioFilm.convertToList();
+		Movie[] array = new Movie[this.dizionarioFilm.getSize()];
 		return tmp.toArray(array);
 	}
 
 	public Person[] getAllPeople() {
-		Person[] array = new Person[dizionarioRegisti.getSize() + dizionarioAttori.getSize()];
-		LinkedList<Person> listaRegisti = dizionarioRegisti.convertToList();
-		LinkedList<Person> listaAttori = dizionarioAttori.convertToList();
+		Person[] array = new Person[this.dizionarioRegisti.getSize() + this.dizionarioAttori.getSize()];
+		LinkedList<Person> listaRegisti = this.dizionarioRegisti.convertToList();
+		LinkedList<Person> listaAttori = this.dizionarioAttori.convertToList();
 		int index = 0;
-		for(int i = 0; i < dizionarioRegisti.getSize(); i++) {
+		for(int i = 0; i < this.dizionarioRegisti.getSize(); i++) {
 			array[index] = listaRegisti.get(i);
 			index++;
 		}
-		for(int i = 0; i < dizionarioAttori.getSize(); i++) {
+		for(int i = 0; i < this.dizionarioAttori.getSize(); i++) {
 			array[index] = listaAttori.get(i);
 			index++;
 		}
@@ -269,7 +274,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 	public Movie[] searchMoviesByTitle(String title) {
 		ArrayList<Movie> tmp = new ArrayList<Movie>();
 		LinkedList<Movie> lista = new LinkedList<Movie>();
-		lista = dizionarioFilm.convertToList();
+		lista = this.dizionarioFilm.convertToList();
 		for(Movie element : lista) {
 			if(element.getTitle().contains(title)) {
 				tmp.add(element);
@@ -282,7 +287,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 	public Movie[] searchMoviesInYear(Integer year) {
 		ArrayList<Movie> tmp = new ArrayList<Movie>();
 		LinkedList<Movie> lista = new LinkedList<Movie>();
-		lista = dizionarioFilm.convertToList();
+		lista = this.dizionarioFilm.convertToList();
 		for(Movie element : lista) {
 			if(element.getYear().equals(year)) {
 				tmp.add(element);
@@ -295,7 +300,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 	public Movie[] searchMoviesDirectedBy(String name) {
 		ArrayList<Movie> tmp = new ArrayList<Movie>();
 		LinkedList<Movie> lista = new LinkedList<Movie>();
-		lista = dizionarioFilm.convertToList();
+		lista = this.dizionarioFilm.convertToList();
 		for(Movie element : lista) {
 			if(element.getDirector().getName().equals(name)) {
 				tmp.add(element);
@@ -308,7 +313,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 	public Movie[] searchMoviesStarredBy(String name) {
 		ArrayList<Movie> tmp = new ArrayList<Movie>();
 		LinkedList<Movie> lista = new LinkedList<Movie>();
-		lista = dizionarioFilm.convertToList();
+		lista = this.dizionarioFilm.convertToList();
 		for(Movie element : lista) {
 			for(Person persona : element.getCast()) {
 				if(persona.getName().equals(name) && tmp.contains(element) == false) {
@@ -325,8 +330,8 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		lista = this.dizionarioFilm.convertToList();
 		Movie[] tmp = new Movie[lista.size()];
 		lista.toArray(tmp);
-		ordinamento.setField("Votes");
-		ordinamento.setOrdinamento(false);
+		this.ordinamento.setField("Votes");
+		this.ordinamento.setOrdinamento(false);
 		tmp = ordinamento.ordina(tmp);
 		if(N > tmp.length) {
 			N = tmp.length;
@@ -343,8 +348,8 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		lista = this.dizionarioFilm.convertToList();
 		Movie[] tmp = new Movie[lista.size()];
 		lista.toArray(tmp);
-		ordinamento.setField("Year");
-		ordinamento.setOrdinamento(false);
+		this.ordinamento.setField("Year");
+		this.ordinamento.setOrdinamento(false);
 		tmp = ordinamento.ordina(tmp);
 		if(N > tmp.length) {
 			N = tmp.length;
@@ -361,7 +366,7 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		lista = this.dizionarioAttori.convertToList();
 		Person[] tmp = new Person[lista.size()];
 		lista.toArray(tmp);
-		ordinamento.setField("Activity");
+		this.ordinamento.setField("Activity");
 		tmp = ordinamento.ordina(tmp);
 		if(N > tmp.length) {
 			N = tmp.length;
@@ -373,5 +378,18 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch {
 		return array;
 	}
 	// IMovidaSearch FINE ------------------------------------------------------
+	
+	// IMovidaCollaborations INIZIO --------------------------------------------
+	public Person[] getDirectCollaboratorsOf(Person actor) {
+		return this.grafo.getDirect(actor);
+	}
+
+	public Person[] getTeamOf(Person actor) {
+		return this.grafo.getIndirect(actor);
+	}
+
+	public Collaboration[] maximizeCollaborationsInTheTeamOf(Person actor) {
+		return this.grafo.maximunSpanningTree(actor);
+	}
 
 }

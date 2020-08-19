@@ -18,7 +18,7 @@ public class _Test {
 		
 		object.loadFromFile(myObj);
 		
-		for(Collaboration element : object.maximizeCollaborationsInTheTeamOf(object.getPersonByName("Robert De Niro"))) {
+		for(Collaboration element : object.maximizeCollaborationsInTheTeamOf(object.getPersonByName("Harrison Ford"))) {
 			System.out.println(element.getActorA().getName() + " " + element.getActorB().getName() + " " + element.getScore());
 		}
 		System.out.println("");

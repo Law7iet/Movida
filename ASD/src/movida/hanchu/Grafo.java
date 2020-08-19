@@ -95,31 +95,33 @@ public class Grafo {
 	public Collaboration[] maximunSpanningTree(Person root) {
 		ArrayList<Collaboration> array = new ArrayList<Collaboration>();
 		HashMap<String, Double> distance = new HashMap<String, Double>();
-		Comparator<Collaboration> comparator = new CollaborationComparator();
-		PriorityQueue<Collaboration> queue = new PriorityQueue<Collaboration>(comparator);
+		Comparator<QueueElement> comparator = new CollaborationComparator();
+		PriorityQueue<QueueElement> queue = new PriorityQueue<QueueElement>(comparator);
 		distance.put(root.getName(), 0.0);
-		for(Collaboration tmp : this.grafo.get(root.getName())) {
-			queue.add(tmp);
-		}
+		queue.add(new QueueElement(root, distance.get(root.getName())));
 		while(!queue.isEmpty()) {
-			Collaboration arco = queue.poll();
-			Person actorB = arco.getActorB();
-			if(distance.containsKey(actorB.getName()) == false) {
-				array.add(arco);
-				distance.put(actorB.getName(), arco.getScore());
-				for(Collaboration tmp : this.grafo.get(actorB.getName())) {
-					queue.add(tmp);
-				}
-			} else {
-				if(distance.containsKey(actorB.getName()) == true) {
-					if(arco.getScore() > distance.get(actorB.getName())) {
-						queue.add(arco);
-						distance.put(actorB.getName(), arco.getScore());
-						array.remove(arco);
-						
+			Person actorA = queue.poll().getPerson();
+			for(Collaboration tmp : this.grafo.get(actorA.getName())) {
+				Person actorB = tmp.getActorB();
+				if(distance.containsKey(actorB.getName()) == false) {
+					distance.put(actorB.getName(), tmp.getScore());
+					queue.add(new QueueElement(actorB, distance.get(actorB.getName())));
+					array.add(tmp);
+				} else {
+					if(tmp.getScore() > distance.get(actorB.getName())) {
+						queue.remove(new QueueElement(actorB, distance.get(actorB.getName())));
+						queue.add(new QueueElement(actorB, tmp.getScore()));
+						distance.put(actorB.getName(), tmp.getScore());
+						for(Collaboration element : array) {
+							if(element.getActorB() == actorB) {
+								array.remove(element);
+								array.add(tmp);
+							}
+						}
 					}
 				}
 			}
+			
 		}
 		return array.toArray(new Collaboration[array.size()]);
 	}

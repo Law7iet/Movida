@@ -5,6 +5,7 @@ import movida.commons.Person;
 
 public class BubbleSort extends Ordinamento {
 
+	// il costruttore
 	public BubbleSort() {
 		super();
 	}
@@ -13,6 +14,7 @@ public class BubbleSort extends Ordinamento {
 		for(int i = 1; i < values.length; i++) {
 			boolean scambiAvvenuti = false;
 			for(int j = 1; j <= values.length - i; j++) {
+				// la funzione 'confronta' è definita in 'Ordinamento'
 				if(confronta(values[j - 1], values[j]) > 0) {
 					Movie tmp = values[j - 1];
 					values[j - 1] = values[j];
@@ -31,6 +33,7 @@ public class BubbleSort extends Ordinamento {
 		for(int i = 1; i < values.length; i++) {
 			boolean scambiAvvenuti = false;
 			for(int j = 1; j <= values.length - i; j++) {
+				// la funzione 'confronta' è definita in 'Ordinamento'
 				if(confronta(values[j - 1], values[j]) > 0) {
 					Person tmp = values[j - 1];
 					values[j - 1] = values[j];
@@ -46,10 +49,12 @@ public class BubbleSort extends Ordinamento {
 	}
 	
 	public Movie[] ordina(Movie[] values) {
+		// chiama la funzione per i film
 		return bubbleSort(values);
 	}
 	
 	public Person[] ordina(Person[] values) {
+		// chiama la funzione per le persone
 		return bubbleSort(values);
 	}
 }

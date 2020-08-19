@@ -6,42 +6,43 @@ public class ListaNonOrdinata<V extends ComparableType<V>> implements Dizionario
 	protected ListaNonOrdinataNodo<V> root;
 	
 	public ListaNonOrdinata() {
-		// inizializza 'head'
 		this.root = null;
 	}
 
 	public V search(String type, V value) throws MovidaCompareException {
+		// si cerca il valore su 'tmp'
 		ListaNonOrdinataNodo<V> tmp = this.root;
 		while(tmp != null) {
 			if(tmp.value.compareTo(type, value) == 0) {
-				// tmp ha come valore l'oggetto ricercato
+				// 'tmp' ha come valore l'oggetto ricercato
 				return tmp.value;
 			} else {
-				// tmp non ha come valore l'oggetto ricercato
-				// si itera su tmp
+				// 'tmp' non ha come valore l'oggetto ricercato
+				// si itera su 'tmp'
 				tmp = tmp.next;
 			}
 		}
 		return null;
 	}
 
+	// si inserisce il nodo in testa
 	public void insert(String type, V value) throws MovidaCompareException {
 		// si cerca l'oggetto
 		V item = search(type, value);
 		if(item == null) {
 			// l'oggetto non è presente
-			// quindi si inserisce l'oggetto in testa
 			if(this.root == null) {
-				// 'head' è vuoto
+				// la struttura è vuota
+				// si inserisce il nodo
 				this.root = new ListaNonOrdinataNodo<V>();
 				this.root.value = value;
 			} else {
-				// si crea una copia di 'head'
+				// si crea una copia della struttura
 				ListaNonOrdinataNodo<V> tmp = this.root;
-				// si inserisce il nuovo oggetto in 'head'
+				// si crea una nuova struttura con il nuovo nodo
 				this.root = new ListaNonOrdinataNodo<V>();
 				this.root.value = value;
-				// si collegga 'head' e 'tmp'
+				// si collega in coda la vecchia struttura (copiata)
 				this.root.next = tmp;
 				tmp.prec = this.root;
 			}
@@ -87,15 +88,4 @@ public class ListaNonOrdinata<V extends ComparableType<V>> implements Dizionario
 		}
 		return lista;
 	}
-
-	/*
-	public void convertToDizionario(V[] values) {
-		this.head = null;
-		int index = 0;
-		// inserisce partendo dalla fine dell'array perché 'insert' inserisce in testa
-		for(index = values.length - 1; index >= 0; index--) {
-			this.insert(values[index]);
-		}
-	}
-	*/
 }

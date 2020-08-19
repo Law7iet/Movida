@@ -12,44 +12,67 @@ import movida.commons.Movie;
 import movida.commons.Person;
 
 public class Grafo {
+	// il grafo è composto da un HashMap che ha come chiave una stringa e valore un array di collaborazioni
+	// la chiave è il nome dell'attore
+	// il valore è la lista di collaborazioni che ha come 'actorA' la chiave
+	// nonostante il grafo sia non orientato, la sua implementazione è orientata
 	protected HashMap<String, ArrayList<Collaboration>> grafo;
 	
+	// il costruttore
 	public Grafo() {
 		this.grafo = new HashMap<String, ArrayList<Collaboration>>();
 	}
 	
+	// aggiunge tutte le collaborazioni di un film
 	public void addMovieCollaboration(Movie movie) {
+		// per ogni attore del film
 		for(Person actorA : movie.getCast()) {
 			String key = actorA.getName();
 			ArrayList<Collaboration> value = new ArrayList<Collaboration>();
+			// si cerca se esiste già nel grafo
 			if(this.grafo.containsKey(key) == true) {
+				// si aggiunge a 'value' le collaborazioni precedenti
 				value = this.grafo.get(key);
 			}
+			// per ogni attore del film
 			for(Person actorB : movie.getCast()) {
 				if(actorA != actorB) {
+					// se sono diversi si aggiunge la nuova collaborazione a 'value'
 					Collaboration tmp = new Collaboration(actorA, actorB);
 					tmp.addMovie(movie);
 					value.add(tmp);
 				}
 			}
+			// si aggiunge la nuova chiave con i nuovi valori oppure si sovrascrivono i valori
 			this.grafo.put(key, value);
 		}
 	}
 	
+	// cancella le collaborazioni di un film
 	public void removeMovieCollaboration(Movie movie) {
+		// per ogni attore del film
 		for(Person actorA : movie.getCast()) {
+			// per ogni attore del film
 			for(Person actorB : movie.getCast()) {
 				if(actorA != actorB) {
+					// se sono diversi
+					// si copia la lista di collaborazioni di actorA
 					ArrayList<Collaboration> list = this.grafo.get(actorA.getName());
 					int index = 0;
+					// si intera tutta la lista
 					while(index < list.size()) {
 						Collaboration tmp = list.get(index);
+						// si cerca la collaborazione da cancellare 
 						if(tmp.getActorA() == actorA && tmp.getActorB() == actorB) {
+							// si rimuove il film dalla collaborazione
 							tmp.removeMovie(movie);
 						}
+						// se la collaborazione non ha nessun film
 						if(tmp.getMovies().length == 0) {
+							// si rimuove la collaborazione
 							list.remove(tmp);
 						} else {
+							// se si elimina la collaborazione non c'è bisogno di muovere l'indice
 							index++;
 						}
 					}
@@ -58,17 +81,20 @@ public class Grafo {
 		}
 	}
 	
+	// è la funzione 'getDirectCollaboratorsOf'
 	public Person[] getDirect(Person actorA) {
+		// prende la lista di collaborazioni che ha come actorA l'input
 		ArrayList<Collaboration> collaborations = this.grafo.get(actorA.getName());
 		ArrayList<Person> actorsB = new ArrayList<Person>();
-		Person[] array = new Person[collaborations.size()];
+		// per ogni actorB della lista si aggiunge all'array
 		for(Collaboration element : collaborations) {
-			System.out.println(element.getActorB().getName() + " " + element.getScore());
 			actorsB.add(element.getActorB());
 		}
-		return actorsB.toArray(array);
+		Person[] array = actorsB.toArray(new Person [collaborations.size()]);
+		return array;
 	}
 	
+	// è la funzione 'getTeamOf'
 	public Person[] getIndirect(Person root) {
 		HashSet<String> marker = new HashSet<String>();
 		ArrayList<Person> team = new ArrayList<Person>();

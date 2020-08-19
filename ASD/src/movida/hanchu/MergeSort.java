@@ -5,7 +5,8 @@ import movida.commons.Movie;
 import movida.commons.Person;
 
 public class MergeSort extends Ordinamento {
-		
+	
+	// il costruttore
 	public MergeSort() {
 		super();
 	}
@@ -16,6 +17,7 @@ public class MergeSort extends Ordinamento {
 		int index = 0;
 		ArrayList<Movie> A = new ArrayList<Movie>(distance);
 		while(i1 <= f1 && i2 <= f2) {
+			// la funzione 'confronta' è definita in 'Ordinamento'
 			if(confronta(values[i1], values[i2]) < 0) {
 				A.add(index, values[i1]);
 				i1++;
@@ -48,6 +50,7 @@ public class MergeSort extends Ordinamento {
 		int index = 0;
 		ArrayList<Person> A = new ArrayList<Person>(distance);
 		while(i1 <= f1 && i2 <= f2) {
+			// la funzione 'confronta' è definita in 'Ordinamento'
 			if(confronta(values[i1], values[i2]) < 0) {
 				A.add(index, values[i1]);
 				i1++;
@@ -95,10 +98,12 @@ public class MergeSort extends Ordinamento {
 	}
 	
 	public Movie[] ordina(Movie[] values) {
+		// chiama la funzione per i film
 		return mergeSort(values, 0, values.length - 1);
 	}
 	
 	public Person[] ordina(Person[] values) {
+		// chiama la funzione per le persone
 		return mergeSort(values, 0, values.length - 1);
 	}
 }

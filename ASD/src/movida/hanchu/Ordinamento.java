@@ -4,7 +4,9 @@ import movida.commons.Movie;
 import movida.commons.Person;
 
 public abstract class Ordinamento {
+	// indica il tipo da confrontare
 	protected String field;
+	// indica l'ordine di confronto
 	protected boolean crescente;
 	
 	public Ordinamento() {
@@ -20,6 +22,7 @@ public abstract class Ordinamento {
 		this.crescente = crescente;
 	}
 	
+	// confronta due film in base al tipo
 	public int confronta(Movie x, Movie y) {
 		int value = 0;
 		switch(this.field) {
@@ -50,6 +53,7 @@ public abstract class Ordinamento {
 		return value;
 	}
 	
+	// confronta le persone in base al tipo
 	public int confronta(Person x, Person y) {
 		int value = 0;
 		switch(this.field) {
@@ -72,12 +76,13 @@ public abstract class Ordinamento {
 		}
 		return value;
 	}
-
 	
+	// ordina un array di film
 	public Movie[] ordina(Movie[] values) {
 		return null;
 	}
 	
+	// ordina un array di persone
 	public Person[] ordina(Person[] values) {	
 		return null;
 	}

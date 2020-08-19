@@ -14,11 +14,4 @@ public interface Dizionario <V> {
 	// Converte il dizionario in una LinkedList
 	// Utilizzata per convertire i dati in un array
 	public LinkedList<V> convertToList();
-	// !-------------------------------------------------------------
-	// È utilizzato?
-	// !-------------------------------------------------------------
-	// Converte un array in un dizionario
-	/*
-	public void convertToDizionario(V[] values);
-	*/
 }

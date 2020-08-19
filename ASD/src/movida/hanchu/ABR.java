@@ -13,6 +13,8 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		return this.root;
 	}
 	
+	// ritorna il valore più piccolo della struttura dati
+	// è per definizione di ABR il nodo più a sinistra
 	public ABRNodo<V> min(ABRNodo<V> node) {
 		if(node == null) {
 			return null;
@@ -25,6 +27,8 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		}
 	}
 	
+	// ritorna il valore più grande della struttura dati
+	// è per definizione di ABR il nodo più a destra
 	public ABRNodo<V> max(ABRNodo<V> node) {
 		if(node == null) {
 			return null;
@@ -89,16 +93,21 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		return search(this.root, type, value);
 	}
 	
+	// cerca ricorsivamente il nodo
 	private V search(ABRNodo<V> node, String type, V value) throws MovidaCompareException {
 		if(node == null) {
+			// non esiste il nodo ricercato
 			return null;
 		} else {
 			if(node.value.compareTo(type, value) == 0) {
+				// trovato il nodo
 				return node.value;
 			} else {
 				if(node.value.compareTo(type, value) > 0) {
+					// si cerca il nodo nel sotto-albero sinistro
 					return search(node.left, type, value);
 				} else {
+					// si cerca il nodo nel sotto-albero destro
 					return search(node.right, type, value);
 				}
 			}
@@ -109,13 +118,18 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
         this.root = insert(this.root, null, type, value);
 	}
 	
+	// inserisce un nodo cercando ricorsivamente il posto corretto
 	private ABRNodo<V> insert(ABRNodo<V> node, ABRNodo<V> parent, String type, V value) throws MovidaCompareException {
 		if(node == null) {
+			// il nodo è vuoto
+			// quindi si inserisce il nodo
 			node = new ABRNodo<V>(value, parent);
 		} else {
 			if(node.value.compareTo(type, value) > 0) {
+				// si inserisce il nodo nel sotto-albero sinitro
 				node.left = insert(node.left, node, type, value);
 			} else {
+				// si inserisce il nodo nel sotto-albero destro
 				node.right = insert(node.right, node, type, value);
 			}
 		}
@@ -126,6 +140,7 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		this.root = delete(this.root, type, value);
 	}
 	
+	// cancella un nodo ricercandolo ricorsivamente
 	private ABRNodo<V> delete(ABRNodo<V> node, String type, V value) throws MovidaCompareException {
 		if(node == null) {
 			// l'oggetto non è presente
@@ -140,7 +155,7 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		            // si trova a destra
 					node.right = delete(node.right, type, value);
 				} else {
-					// 'node' è l'oggettoo da cancellare
+					// 'node' è l'oggetto da cancellare
 					if(node.left == null && node.right == null) {
 						// 'node' è una foglia
 						// lo si cancella direttamente
@@ -155,7 +170,6 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 
 							// il padre del predecessore ha come figlio destro il figlio sinistro del predecessore
 							node.left = pred.left;
-
 						} else {
 							// il nodo ha un figlio solo
 							if(node.left != null) {
@@ -179,10 +193,14 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		return getSize(this.root);
 	}
 	
+	// conta il numero dei nodo nella struttura ricorsivamente
 	private int getSize(ABRNodo<V> node) {
 		if(node == null) {
+			// non esiste il nodo
 			return 0;
 		} else {
+			// esiste il nodo
+			// quindi si aggiunge +1 e si cerca nei suoi sotto-alberi
 			return 1 + getSize(node.left) + getSize(node.right);
 		}
 	}
@@ -211,20 +229,4 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 		pre_visit(this.root, lista);
 		return lista;
 	}
-
-	/*
-	// !----------------------------------------------------------------------------------------------
-	// se si converte l'albero in un array e lo si ordina
-	// dopo aver convertito l'albero con i dati dell'array, futuri insert non rendono l'albero un ABR
-	// !----------------------------------------------------------------------------------------------
-	public void convertToDizionario(V[] values) {
-		// essendo un ABR e l'array "ordinato" si inseriscono gli elementi dal minimo
-		ABRNodo<V> tmp = min(this.root);
-		for(V element : values) {
-			tmp.value = element;
-			// si passa al successivo elemento
-			tmp = successore(tmp);		
-		}
-	}
-	*/
 }

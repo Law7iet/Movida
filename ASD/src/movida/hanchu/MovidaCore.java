@@ -2,6 +2,7 @@ package movida.hanchu;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ import java.util.List;
 import movida.commons.*;
 
 public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMovidaCollaborations {
+	
 	// strutture dati per i film, gli attori ed i registi
 	protected Dizionario<Movie> dizionarioFilm;
 	protected Dizionario<Person> dizionarioAttori;
@@ -95,13 +97,25 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 				}
 				
 				// copia i dati mel giusto tipo adatto per l'oggetto movie
+				if (riga0.isEmpty() == true || riga0.startsWith(" ") == true) {
+					// il titolo è errato
+					throw new MovidaFileException();
+				}
 				String title = riga0;
 				int year = Integer.parseInt(riga1);
+				if (riga2.startsWith(" ") == true || riga2.isEmpty() == true) {
+					// il regista è errato
+					throw new MovidaFileException();
+				}
 				Person director = new Person(riga2, 1);
 				String[] tmp = riga3.split(", ");
 				Person[] cast = new Person[tmp.length];
 				int index = 0;
 				for(String name : tmp) {
+					if(name.isEmpty() == true || name.startsWith(" ")) {
+						// l'attore è errato
+						throw new MovidaFileException();
+					}
 					cast[index] = new Person(name, 1);
 					index++;
 				}
@@ -145,13 +159,25 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 				}
 				// rimuovere la riga vuota
 				// non è presente nell'ultimo film
-				if(lines.get(0).equals("")) {
+				if(!lines.isEmpty()) {
 					lines.remove(0);
 				}
 			}
 		}
-		catch(Exception e) {
-			e.getMessage();
+		catch (IOException e) {
+			System.out.println("Errore. File " + e.getMessage() + " inesistente nella direcotry.");
+		}
+		catch (IndexOutOfBoundsException e) {
+			System.out.println("Errore. Dati del film insufficienti.");
+		}
+		catch (NumberFormatException e) {
+			System.out.println("Errore. Dati del film insufficienti.");
+		}
+		catch (MovidaCompareException e) {
+			System.out.println(e.getMessage());
+		}
+		catch(MovidaFileException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -207,12 +233,13 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 	}
 
 	public boolean deleteMovieByTitle(String title) throws MovidaCompareException {
+		// variabili ausiliarie
+		boolean trovato = false;
+		Movie film = null;
+		
 		// si converte i film in un array
 		LinkedList<Movie> lista = this.dizionarioFilm.convertToList();
 		Movie[] array = lista.toArray(new Movie[this.dizionarioFilm.getSize()]);
-		
-		boolean trovato = false;
-		Movie film = null;
 		
 		// cerca il film scansionando tutti i film
 		for(Movie movie : array) {
@@ -224,8 +251,9 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 			}
 		}
 		
+		// controlla l'esistenza del film mediante la variabile 'trovato'
 		if(trovato) {
-			// se il film esiste, si cancella tale film e i relativi collaboratori
+			// si cancella il film e i relativi collaboratori
 			this.grafo.removeMovieCollaboration(film);
 			this.dizionarioFilm.delete("Title", film);
 		}
@@ -234,11 +262,11 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 
 	public Movie getMovieByTitle(String title) {
 		// si converte i film in un array
-		LinkedList<Movie> tmp = this.dizionarioFilm.convertToList();
-		Movie[] lista = (Movie[]) tmp.toArray();
+		LinkedList<Movie> lista = this.dizionarioFilm.convertToList();
+		Movie[] array = lista.toArray(new Movie[this.dizionarioFilm.getSize()]);
 		
 		// si cerca il film scansionanddo tutti i film
-		for(Movie movie : lista) {
+		for(Movie movie : array) {
 			if(movie.getTitle().compareTo(title) == 0) {
 				// il film esiste
 				return movie;
@@ -433,15 +461,29 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 	
 	// IMovidaCollaborations INIZIO --------------------------------------------
 	public Person[] getDirectCollaboratorsOf(Person actor) {
-		return this.grafo.getDirect(actor);
+		if(actor == null) {
+			return null;
+		} else {
+			return this.grafo.getDirect(actor);
+		}
 	}
 
 	public Person[] getTeamOf(Person actor) {
-		return this.grafo.getIndirect(actor);
+		if(actor == null) {
+			return null;
+		} else {
+			return this.grafo.getIndirect(actor);
+		}
 	}
-
+	
 	public Collaboration[] maximizeCollaborationsInTheTeamOf(Person actor) {
-		return this.grafo.maximunSpanningTree(actor);
+		if(actor == null) {
+			return null;
+		} else {
+			return this.grafo.maximunSpanningTree(actor);
+		}
 	}
-
+	
+	// IMovidaCollaboration FINE -----------------------------------------------
+	
 }

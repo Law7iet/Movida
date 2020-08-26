@@ -19,6 +19,6 @@ public class MovidaFileException extends RuntimeException {
 
 	@Override
 	public String getMessage() {
-		return "Errore caricamento o salvataggio dati.";
+		return "Errore. Dati del film errati.";
 	}
 }

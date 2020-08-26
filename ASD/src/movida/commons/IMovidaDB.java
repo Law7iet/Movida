@@ -9,6 +9,7 @@
 package movida.commons;
 
 import java.io.File;
+import java.io.IOException;
 
 import movida.hanchu.MovidaCompareException;
 
@@ -35,10 +36,12 @@ public interface IMovidaDB {
 	 * viene sollevata un'eccezione.
 	 * 
 	 * @param f il file da cui caricare i dati
+	 * @throws IOException 
 	 * 
 	 * @throws MovidaFileException in caso di errore di caricamento
+	 * @throws MovidaCompareException 
 	 */
-	public void loadFromFile(File f);
+	public void loadFromFile(File f) throws MovidaFileException, IOException, MovidaCompareException;
 
 	/**
 	 * Salva tutti i dati su un file. 

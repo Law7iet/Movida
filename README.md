@@ -1,7 +1,7 @@
-##IMovidaConfig
+## IMovidaConfig
 - viene fatto all'inizio del carimento dei dati, poiché tale comando cancella eventuali vecchi dati.
 
-##IMovidaDB
+## IMovidaDB
 
 ### loadFromFile:
 - il file che carica deve essere nella directory principale, altrimenti lancia un errore.
@@ -36,7 +36,7 @@
     - ABR \- segue un ordine "in-visita";
     - ListaNonOrdinata \- segue l'ordine di inserimento;
 
-##IMovidaSearch
+## IMovidaSearch
 - l'input se è una stringa è key sensitive.
 - l'input deve avere lo stesso nome dell'oggetto che si ricerca, altrimenti non lo si trova.
 

@@ -40,11 +40,18 @@ public class Grafo {
 				// la coppia non è composta da due attori diversi
 				if(actorA != actorB) {
 					// sono diversi
-					// si aggiunge la nuova collaborazione a 'value'
 					Collaboration tmp = new Collaboration(actorA, actorB);
+					// cerca la collaborazione fra actorA e actorB fra quelli già esistenti
+					for(Collaboration collaboration : value) {
+						if(collaboration.getActorA().getName().equals(actorA.getName()) && collaboration.getActorB().getName().equals(actorB.getName())) {
+							tmp = collaboration;
+						}
+					}
+					// si aggiunge la nuova collaborazione a 'value'
 					tmp.addMovie(movie);
 					value.add(tmp);
 				}
+				
 			}
 			// si aggiunge la nuova chiave con i nuovi valori oppure si sovrascrivono i valori
 			this.grafo.put(key, value);
@@ -139,40 +146,62 @@ public class Grafo {
 		return team.toArray(tmp);
 	}
 	
-	// 
+	// è la funzione 'maximizeCollaborationsInTheTeamOf'
+	// il problema è risolvibile tramite un Maximun Spanning Tree
+	// i nodi sono le persone
+	// gli archi sono le collaborazioni
 	public Collaboration[] maximunSpanningTree(Person root) {
+		// creazione delle strutture dati ausiliarie:
+		// array è il vettore contenente le collaborazioni/archi che rappresentano la soluzione del grafo
 		ArrayList<Collaboration> array = new ArrayList<Collaboration>();
+		// distance è la struttura che contiene le distanze dal nodo-radice
 		HashMap<String, Double> distance = new HashMap<String, Double>();
+		// è un comparatore per la coda con priorità
 		Comparator<QueueElement> comparator = new CollaborationComparator();
+		// il tipo QueueElement è composto da una persona e una chiave che serve per il confronto
 		PriorityQueue<QueueElement> queue = new PriorityQueue<QueueElement>(comparator);
-		distance.put(root.getName(), 0.0);
+		// si pone la radice con distanza massima
+		distance.put(root.getName(), Double.MAX_VALUE);
+		// si aggiunge la radice alla coda
 		queue.add(new QueueElement(root, distance.get(root.getName())));
+		
 		while(!queue.isEmpty()) {
+			// si estrae la prima persona con priorità maggiore
+			// la priorità è misurata con 'comparator'
+			// esso da priorità a chi ha il valore più alto
+			// il valore è dato dal 'getScore' di una collaborazione
 			Person actorA = queue.poll().getPerson();
+			// si itera sugli archi del nodo
 			for(Collaboration tmp : this.grafo.get(actorA.getName())) {
 				Person actorB = tmp.getActorB();
+				// controlla se 'distance' contiene o meno il nodo d'arrivo
 				if(distance.containsKey(actorB.getName()) == false) {
+					// se non lo contiene, significa che è nuovo e bisogna aggiungerlo
 					distance.put(actorB.getName(), tmp.getScore());
 					queue.add(new QueueElement(actorB, distance.get(actorB.getName())));
 					array.add(tmp);
 				} else {
+					// se lo contiene
+					// si controlla quale arco ha il valore più grande
 					if(tmp.getScore() > distance.get(actorB.getName())) {
-						queue.
-						QueueElement x = new QueueElement(actorB, distance.get(actorB.getName()));
-						queue.remove(x);
+						// l'arco nuovo è più grande allora si cambia l'arco per raggiungere il nodo d'arrivo
 						queue.add(new QueueElement(actorB, tmp.getScore()));
 						distance.put(actorB.getName(), tmp.getScore());
-						for(Collaboration element : array) {
-							if(element.getActorB() == actorB) {
-								array.remove(element);
+						int index = 0;
+						// si cerca l'arco da cambiare nel vettore delle collaborazioni
+						while(index < array.size()) {
+							if(array.get(index).getActorB().getName().equals(actorB.getName())) {
+								// si sostituisce la collaborazione
+								array.remove(index);
 								array.add(tmp);
 							}
-						}
+							index++;
+						}						
 					}
 				}
 			}
-			
 		}
+		
 		return array.toArray(new Collaboration[array.size()]);
 	}
 }

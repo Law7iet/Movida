@@ -168,7 +168,7 @@ public class ABR<V extends ComparableType<V>> implements Dizionario<V> {
 							// il nodo da cancellare assume valore del predecessore
 							node.value = pred.value;
 							// il padre del predecessore ha come figlio destro il figlio sinistro del predecessore
-							node.left = pred.left;
+							pred.parent.right = pred.left;
 						} else {
 							// il nodo ha un figlio solo
 							if(node.left != null) {

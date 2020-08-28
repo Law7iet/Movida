@@ -45,6 +45,10 @@ public class Person implements ComparableType<Person> {
 		this.film++;
 	}
 	
+	public void removeFilm() {
+		this.film--;
+	}
+	
 	// compara il titolo di due film
 	public int compareTo(String type, Person name) throws MovidaCompareException {
 		switch(type) {

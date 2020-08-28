@@ -129,6 +129,20 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 					dizionarioFilm.insert("Title", movie);
 				} else {
 					// se è presente lo si sovrascrive
+					Movie temp = dizionarioFilm.search("Title", movie);
+					// cancella il regista
+					dizionarioRegisti.search("Name", temp.getDirector()).removeFilm();
+					if(dizionarioRegisti.search("Name", temp.getDirector()).getFilm() == 0) {
+						dizionarioRegisti.delete("Name", temp.getDirector());
+					}
+					// cancella gli attori
+					for(Person person : temp.getCast()) {
+						dizionarioAttori.search("Name", person).removeFilm();
+						if(dizionarioAttori.search("Name", person).getFilm() == 0) {
+							dizionarioAttori.delete("Name", person);
+						}
+					}
+					// cancella il film
 					dizionarioFilm.delete("Title", movie);
 					dizionarioFilm.insert("Title", movie);
 				}

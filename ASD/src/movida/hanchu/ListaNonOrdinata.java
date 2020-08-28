@@ -56,8 +56,15 @@ public class ListaNonOrdinata<V extends ComparableType<V>> implements Dizionario
 			if(tmp.value.compareTo(type, value) == 0) {
 				// 'tmp' è l'oggetto ricercato
 				// per eliminarlo si sposta il puntatore 'next' di 'prec' al 'next' di 'tmp'
-				tmp.prec.next = tmp.next;
-				tmp = null;
+				if(this.root == tmp) {
+					// il nodo da cancellare è la radice
+					tmp.next.prec = null;
+					this.root = tmp.next;
+					break;
+				} else {
+					tmp.prec.next = tmp.next;
+					tmp = null;
+				}
 			} else {
 				// 'tmp' non è l'oggetto ricercato
 				// si cerca nel suo 'next'

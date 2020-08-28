@@ -1,7 +1,6 @@
 package movida.hanchu;
 
 import java.io.File;
-
 import movida.commons.Collaboration;
 import movida.commons.MapImplementation;
 import movida.commons.Movie;
@@ -20,11 +19,11 @@ public class _Test {
 		// test di IMovidaConfig Inizio -----------------------------------------
 		
 		// test di setMap
-		object.setMap(MapImplementation.ABR);
-//		object.setMap(MapImplementation.ListaNonOrdinata);		
+//		object.setMap(MapImplementation.ABR);
+//		object.setMap(MapImplementation.ListaNonOrdinata);
 		
 		// test di setSort
-		object.setSort(SortingAlgorithm.BubbleSort);
+//		object.setSort(SortingAlgorithm.BubbleSort);
 //		object.setSort(SortingAlgorithm.MergeSort);
 		
 		// test di IMovidaConfig Fine -------------------------------------------
@@ -33,11 +32,11 @@ public class _Test {
 		// test di IMovidaDB Inizio ---------------------------------------------
 		
 		// test di loadFromFile
-		File file1 = new File("esempio-formato-dati.txt");
-		object.loadFromFile(file1);
+//		File file1 = new File("esempio-formato-dati.txt");
+//		object.loadFromFile(file1);
 		
-		File file2 = new File("test-file.txt");
-		object.loadFromFile(file2);
+//		File file2 = new File("test-file.txt");
+//		object.loadFromFile(file2);
 		
 		// test di saveToFile
 //		File tmp = new File("saveToFile.txt");
@@ -54,12 +53,13 @@ public class _Test {
 		
 		// test di deleteMovieByTitle
 //		object.deleteMovieByTitle("Cape Fear");
+//		System.out.println(object.countMovies());
 		
 		// test di getMovieByTitle
 //		object.getMovieByTitle("Scarface");
 		
 		// test di getPersonByName
-//		object.getPersonByName("Martin Scorsese");
+//		System.out.println(object.getPersonByName("Andrew Davis").getFilm());
 		
 		// test di getAllMovies
 //		for(Movie movie : object.getAllMovies()) {
@@ -135,13 +135,13 @@ public class _Test {
 //		}
 		
 		// test di maximizeCollaborationInTheTeamOf
-		Person persona = object.getPersonByName("Uma Thurman");
-		Collaboration[] tmp = object.maximizeCollaborationsInTheTeamOf(persona);
-		for(Collaboration collaboration : tmp) {
-			System.out.println(collaboration.getActorA().getName() + " - " + collaboration.getActorB().getName() + " -  Score: " + collaboration.getScore());
-		}
+//		Person persona = object.getPersonByName("Bonnie Bedelia");
+//		Collaboration[] tmp = object.maximizeCollaborationsInTheTeamOf(persona);
+//		for(Collaboration collaboration : tmp) {
+//			System.out.println(collaboration.getActorA().getName() + " - " + collaboration.getActorB().getName() + " - Score: " + collaboration.getScore());
+//		}
 		
-		// test ddu IMovidaCollaboration Fine --------------------------------------
+		// test di IMovidaCollaboration Fine --------------------------------------
 		
 		System.out.println("Fine test MovidaCore.");
 	}

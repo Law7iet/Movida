@@ -497,7 +497,6 @@ public class MovidaCore implements IMovidaConfig, IMovidaDB, IMovidaSearch, IMov
 			return this.grafo.maximunSpanningTree(actor);
 		}
 	}
-	
 	// IMovidaCollaboration FINE -----------------------------------------------
 	
 }

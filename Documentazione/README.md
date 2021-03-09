@@ -2,6 +2,14 @@
 Nome del gruppo: HanChu
 Componenti: Han Chu - 0000882776
 
+## Istruzioni per il Test
+Per eseguire il programma test bisogna avere installato il [Java Development Kit](https://www.oracle.com/java/technologies/javase-downloads.html).
+1. Scaricare la repository
+2. Aprire il terminale e posizionarsi nella cartella `Movida/`
+3. Digitare `make` per compilare i file
+4. Digitare `make run` per eseguire il test
+5. Per cancellare i *Byte Code* digitare `make clean`.
+
 ## Implementazione
 Un'istanza di MovidaCore deve contenere i metodi di IMovidaConfig, IMovidaDB, IMovidaSearch e IMovidaCollaboration.
 I campi di MovidaCore sono:

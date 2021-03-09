@@ -1,6 +1,2 @@
 .DS_Store
-.classpath
-.project
-ASD/bin/*
-ASD/bin/movida/commons/Person.class
-ASD/bin/movida/commons/Movie.class
+*.class
